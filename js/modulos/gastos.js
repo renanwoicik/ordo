@@ -1,5 +1,5 @@
 /* =========================================================
-   Sistema · módulo Gastos (CPF e CNPJ)
+   Sistema · módulo Gastos (Pessoal e Trabalho)
    Lançamentos, parcelados, estornos, contas fixas, importação
    de fatura/extrato e cálculos do mês. A tela Dinheiro → Gastos
    e o Resumo geral usam as funções daqui.
@@ -19,7 +19,10 @@
        limite (gasto máximo por mês), metaSobra }
      Valem todo mês, até você mudar.
 
-   Contas fixas marcadas como CNPJ são os CUSTOS FIXOS DO TRABALHO: o
+   Na tela aparecem Pessoal e Trabalho; por dentro os valores continuam
+   'CPF' e 'CNPJ'. Assim, basta mudar nomeConta quando houver PJ.
+
+   Contas fixas de Trabalho são os CUSTOS FIXOS DO TRABALHO: o
    Resumo geral as desconta das entradas para chegar ao ganho líquido.
    ========================================================= */
 
@@ -32,11 +35,13 @@ const COL = 'gastos';
 const COL_F = 'fixas';
 
 export const CATS_PADRAO = {
-  CNPJ: ['Anúncios', 'Ferramentas', 'Educação', 'Serviços', 'Equipe', 'Impostos', 'Outros'],
+  CNPJ: ['Sistemas', 'Anuidades', 'Internet e telefone', 'Educação', 'Serviços', 'Custas', 'Impostos', 'Outros'],
   CPF: ['Mercado', 'Restaurante', 'Casa', 'Pet', 'Roupas', 'Beleza', 'Saúde', 'Lazer', 'Transporte', 'Educação', 'Serviços', 'Juros e taxas', 'Outros'],
 };
-const CARTOES_PADRAO = [{ id: 'c1', nome: 'Cartão 1' }, { id: 'c2', nome: 'Cartão 2' }];
+const CARTOES_PADRAO = [{ id: 'c1', nome: 'Cartão' }];
 const OUTROS_MEIOS = [{ id: 'pix', nome: 'Pix' }, { id: 'debito', nome: 'Débito' }, { id: 'dinheiro', nome: 'Dinheiro' }];
+
+export const nomeConta = (c) => (c === 'CNPJ' ? 'Trabalho' : 'Pessoal');
 
 /* ---------- configuração ---------- */
 
@@ -172,7 +177,7 @@ export function abrirGasto(gasto = null, { mes, prefill = {} } = {}) {
       <div class="fld"><label for="g-desc">Descrição</label>
         <input id="g-desc" value="${esc(g.desc)}" placeholder="Ex.: mercado, assinatura, material de escritório" autocomplete="off"></div>
       <div class="fld"><span class="l">Conta</span>
-        <div class="opcoes" id="g-conta"><button type="button" data-v="CPF" aria-pressed="${g.conta === 'CPF'}">CPF</button><button type="button" data-v="CNPJ" aria-pressed="${g.conta === 'CNPJ'}">CNPJ</button></div></div>
+        <div class="opcoes" id="g-conta"><button type="button" data-v="CPF" aria-pressed="${g.conta === 'CPF'}">Pessoal</button><button type="button" data-v="CNPJ" aria-pressed="${g.conta === 'CNPJ'}">Trabalho</button></div></div>
       <div class="fld"><label for="g-cat">Categoria</label><select id="g-cat">${opcoesCat(cfg.categorias[g.conta], g.cat)}</select></div>
       <div class="fld"><span class="l">Como pagou</span><div class="opcoes" id="g-meio">${botoes(meios(), g.meio)}</div></div>
       <div class="par">
@@ -182,7 +187,7 @@ export function abrirGasto(gasto = null, { mes, prefill = {} } = {}) {
       ${novo ? `<div class="fld"><label for="g-parc">Parcelas</label>
         <select id="g-parc">${[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => `<option value="${n}">${n === 1 ? 'À vista (1x)' : `${n}x`}</option>`).join('')}</select>
         <small id="g-parc-info">O valor digitado é o total da compra.</small></div>` : (parcelado ? `<div class="previa">Parcela ${g.parcela} de ${g.parcelas}. Para mudar as outras, edite cada uma.</div>` : '')}
-      <label class="chk"><input type="checkbox" id="g-rev" ${g.revisar ? 'checked' : ''}> Ainda não sei se é CPF ou CNPJ</label>
+      <label class="chk"><input type="checkbox" id="g-rev" ${g.revisar ? 'checked' : ''}> Ainda não sei se é pessoal ou do trabalho</label>
       <div class="erro" id="g-erro" role="alert"></div>
       ${novo ? '' : '<div class="opcoes acoes-tarefa"><button type="button" data-acao="apagar" class="perigo">Apagar gasto</button></div>'}
       <div class="acts"><button type="button" class="btn sec" data-fechar>Cancelar</button><button type="submit" class="btn pri">Salvar</button></div>
@@ -252,8 +257,8 @@ export function abrirFixa(fixa = null) {
         <div class="fld"><label for="x-dia">Vence no dia</label><input id="x-dia" type="number" min="1" max="31" value="${x.dia || ''}" inputmode="numeric"></div>
       </div>
       <div class="fld"><span class="l">Conta</span>
-        <div class="opcoes" id="x-conta"><button type="button" data-v="CPF" aria-pressed="${x.conta === 'CPF'}">CPF</button><button type="button" data-v="CNPJ" aria-pressed="${x.conta === 'CNPJ'}">CNPJ</button></div>
-        <small>CNPJ vira custo do trabalho sozinho (desconta do ganho líquido). CPF entra só nos seus gastos.</small></div>
+        <div class="opcoes" id="x-conta"><button type="button" data-v="CPF" aria-pressed="${x.conta === 'CPF'}">Pessoal</button><button type="button" data-v="CNPJ" aria-pressed="${x.conta === 'CNPJ'}">Trabalho</button></div>
+        <small>Trabalho vira custo sozinho (desconta do ganho líquido). Pessoal entra só nos seus gastos.</small></div>
       <div class="fld"><label for="x-cat">Categoria</label><select id="x-cat">${opcoesCat(cfg.categorias[x.conta], x.cat)}</select></div>
       <div class="par">
         <div class="fld"><label for="x-desde">Vale a partir de</label><input id="x-desde" type="month" value="${esc(desde)}"></div>
@@ -320,8 +325,8 @@ export function abrirConfigGastos() {
         <div class="fld"><label for="c-sobra">Quanto quer que sobre</label><div class="com-sufixo"><input id="c-sobra" inputmode="decimal" value="${numBR(cfg.metaSobra)}"><span>R$/mês</span></div></div>
       </div>
       <div class="rot acc">Categorias</div>
-      <div class="fld"><label for="c-cpf">CPF (separe por vírgula)</label><textarea id="c-cpf" rows="3">${esc(cfg.categorias.CPF.join(', '))}</textarea></div>
-      <div class="fld"><label for="c-cnpj">CNPJ (separe por vírgula)</label><textarea id="c-cnpj" rows="2">${esc(cfg.categorias.CNPJ.join(', '))}</textarea>
+      <div class="fld"><label for="c-cpf">Pessoal (separe por vírgula)</label><textarea id="c-cpf" rows="3">${esc(cfg.categorias.CPF.join(', '))}</textarea></div>
+      <div class="fld"><label for="c-cnpj">Trabalho (separe por vírgula)</label><textarea id="c-cnpj" rows="2">${esc(cfg.categorias.CNPJ.join(', '))}</textarea>
         <small>Lembre de manter “Outros”. Gastos já lançados com uma categoria removida continuam como estão.</small></div>
       <div class="acts"><button type="button" class="btn sec" data-fechar>Cancelar</button><button type="submit" class="btn pri">Salvar</button></div>
     </form>`);
@@ -352,8 +357,8 @@ const PALAVRAS = [
   [/uber|99 ?pop|99app|posto|combust|estacionamento|sem parar|veloe/, 'CPF', 'Transporte'],
   [/mercado|supermerc|atacad|carrefour|assai|angeloni|condor|hortifruti/, 'CPF', 'Mercado'],
   [/farmacia|drogaria|droga raia|panvel|pague menos|clinica|hospital|laborat/, 'CPF', 'Saúde'],
-  [/facebook|facebk|fbk|meta ?ads|fb ?ads|instagram|google ?ads|tiktok ?ads/, 'CNPJ', 'Anúncios'],
-  [/canva|notion|adobe|chatgpt|openai|anthropic|claude|google workspace|zoom|hostinger/, 'CNPJ', 'Ferramentas'],
+  [/jusbrasil|projuris|astrea|adv ?box|certisign|serasa experian|valid certificadora/, 'CNPJ', 'Sistemas'],
+  [/\boab\b|ordem dos advogados/, 'CNPJ', 'Anuidades'],
   [/juros|iof|encargos|multa|tarifa|anuidade/, 'CPF', 'Juros e taxas'],
   [/netflix|spotify|disney|hbo|prime video|cinema|ingresso/, 'CPF', 'Lazer'],
 ];
@@ -473,7 +478,7 @@ function conferirImportacao(itens, ehOfx) {
         <label class="imp-top"><input type="checkbox" class="i-chk" ${r.marcada !== false && !r.repetido ? 'checked' : ''} ${r.repetido ? 'disabled' : ''}>
           <span class="imp-desc">${esc(r.desc)}<small>${r.data.split('-').reverse().slice(0, 2).join('/')}${r.repetido ? ' · já lançado' : ''}</small></span>
           <span class="num ${r.valor < 0 ? 'neg-txt' : ''}">${brl(r.valor)}</span></label>
-        <div class="imp-sel"><select class="i-conta"><option ${r.conta === 'CPF' ? 'selected' : ''}>CPF</option><option ${r.conta === 'CNPJ' ? 'selected' : ''}>CNPJ</option></select>
+        <div class="imp-sel"><select class="i-conta"><option value="CPF" ${r.conta === 'CPF' ? 'selected' : ''}>Pessoal</option><option value="CNPJ" ${r.conta === 'CNPJ' ? 'selected' : ''}>Trabalho</option></select>
           <select class="i-cat">${opcoesCat(cfg.categorias[r.conta], r.cat)}</select></div>
       </div>`).join('');
   };
@@ -508,12 +513,12 @@ avisos.registrar('gastos', () => {
   const lista = [];
   const ym = isoMes(), hoje = new Date().getDate();
   const rev = paraRevisar().length;
-  if (rev) lista.push({ id: 'gastos-revisar', tipo: 'mid', prioridade: 3, irPara: '#/dinheiro/gastos', texto: `<strong>${rev}</strong> ${rev === 1 ? 'gasto marcado' : 'gastos marcados'} para revisar (CPF ou CNPJ?).` });
+  if (rev) lista.push({ id: 'gastos-revisar', tipo: 'mid', prioridade: 3, irPara: '#/dinheiro/gastos', texto: `<strong>${rev}</strong> ${rev === 1 ? 'gasto marcado' : 'gastos marcados'} para revisar (pessoal ou trabalho?).` });
   const pagos = fixasPagas(ym);
   const vencidas = fixas(ym).filter((f) => !pagos[f.id] && f.dia <= hoje);
   if (vencidas.length) lista.push({ id: 'fixas-vencidas', tipo: 'warn', prioridade: 4, irPara: '#/dinheiro/gastos', texto: `Contas fixas já vencidas e não marcadas como pagas: ${vencidas.map((f) => esc(f.nome)).join(', ')}.` });
   const c = calcular(ym);
-  if (c.pctLimite != null && c.pctLimite >= 100) lista.push({ id: 'limite', tipo: 'warn', prioridade: 4, irPara: '#/dinheiro/gastos', texto: `Você passou do limite de gastos do mês em <strong>${brl(c.total - c.limite)}</strong>.` });
-  else if (c.pctLimite != null && c.pctLimite >= 80) lista.push({ id: 'limite', tipo: 'mid', prioridade: 3, irPara: '#/dinheiro/gastos', texto: `Você já usou <strong>${Math.round(c.pctLimite)}%</strong> do limite de gastos do mês.` });
+  if (c.pctLimite != null && c.pctLimite >= 100) lista.push({ id: 'limite', tipo: 'warn', prioridade: 4, irPara: '#/dinheiro/gastos', texto: 'Você passou do <strong>limite de gastos</strong> do mês.' });
+  else if (c.pctLimite != null && c.pctLimite >= 80) lista.push({ id: 'limite', tipo: 'mid', prioridade: 3, irPara: '#/dinheiro/gastos', texto: 'Você está perto do <strong>limite de gastos</strong> do mês.' });
   return lista;
 });

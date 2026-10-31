@@ -61,7 +61,7 @@ function semana() {
   const recusadas = T.foraDaSemana('recusada'), delegadas = T.foraDaSemana('delegada');
 
   let aviso;
-  if (!livresDefinidas) aviso = `<button class="alert mid" data-horas><span class="d"></span><div><strong>Defina suas horas livres</strong> para eu avisar quando a semana não fechar. Toque aqui.</div></button>`;
+  if (!livresDefinidas) aviso = '';
   else if (!r.fecha) aviso = `<div class="alert warn"><span class="d"></span><div><strong>Essa semana não fecha.</strong> São ${duracao(r.minTarefas)} de tarefas para ${duracao(r.minLivres)} livres. Adie, recuse ou delegue alguma coisa.</div></div>`;
   else {
     // A semana cabe no total, mas algum dia (de hoje em diante) pode ter passado do limite.
@@ -97,7 +97,7 @@ function semana() {
             ${d.tarefas.map((t) => chipTarefa(t, hoje)).join('')}
             <button class="add-dia" data-novo-dia="${d.iso}" aria-label="Nova tarefa em ${d.nome}">${icone.soma(16)}</button>
           </div>`).join('')}</div>
-        <small style="color:var(--soft)">No Mac, dá para arrastar as tarefas entre os dias. No iPhone, toque na tarefa e mude o dia.</small>` })}
+        <small style="color:var(--soft)">No computador, dá para arrastar as tarefas entre os dias. No celular, toque na tarefa e mude o dia.</small>` })}
 
     <div class="grade g-2">
       ${painel({ rot: 'Para encaixar', titulo: 'Sem dia <em>definido</em>',
@@ -217,7 +217,7 @@ function habitos() {
           <span>${mesPorExtenso(ym)}</span>
           <button class="redondo" data-mes="1" aria-label="Próximo mês" ${ehAtual ? 'disabled' : ''}>${icone.seta(18)}</button>
           <span style="flex:1"></span>
-          <button class="btn sec" data-lembretes-hab>Lembretes no iPhone</button>
+          <button class="btn sec" data-lembretes-hab>Alarmes no calendário</button>
           <button class="btn pri" data-novo-hab>${icone.soma(16)} Novo hábito</button>
         </div>
         ${linhas || '<div class="vazio">Nenhum hábito ainda. Toque em “Novo hábito”.</div>'}

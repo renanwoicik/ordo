@@ -49,7 +49,7 @@ export function desenhar(el) {
     </div>
 
     <div class="filtros" style="justify-content:space-between"><div class="filtros">${[['todas', 'Todos'], ...V.CATEGORIAS.map((c) => [c.id, c.nome])].map(([id, n]) => `<button type="button" class="chip ${estado.cat === id ? 'acc' : ''}" data-cat="${id}">${n}</button>`).join('')}</div>
-      <button type="button" class="btn sec" data-calendario>Lembretes no iPhone</button></div>
+      <button type="button" class="btn sec" data-calendario>Alarmes no calendário</button></div>
 
     ${filtrados.length
       ? grupos.map(([titulo, teste]) => { const l = filtrados.filter(teste); return l.length ? painel({ rot: 'Linha do tempo', titulo, corpo: `<div class="linhas">${l.map(linha).join('')}</div>` }) : ''; }).join('')

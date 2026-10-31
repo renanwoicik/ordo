@@ -43,7 +43,7 @@ function telaBoasVindas(pronto) {
       <p><b>Seus dados ficam protegidos por uma senha.</b></p>
       <ul>
         <li>Tudo é guardado embaralhado neste aparelho.</li>
-        <li>Sem a senha, ninguém lê nada: nem quem pegar o celular, nem a nuvem (quando ligarmos a sincronização).</li>
+        <li>Sem a senha, ninguém lê nada: nem quem pegar o celular, nem a nuvem.</li>
         <li>Você também vai receber uma <b>chave de recuperação</b>, para o caso de esquecer a senha.</li>
       </ul>
     </div>
@@ -111,7 +111,7 @@ function telaChaveRecuperacao(chaveRec, pronto) {
       <p><b>Esta é a sua chave de recuperação.</b></p>
       <p>Se um dia esquecer a senha, só ela abre os seus dados. Ela aparece <b>só agora</b>.</p>
       ${htmlChave(chaveRec)}
-      <p style="margin-top:14px;color:var(--soft);font-size:13.5px">Sugestão: guarde no app <b>Senhas</b> do iPhone (como uma nota) <b>e</b> num papel em casa. Não mande por WhatsApp nem e-mail.</p>
+      <p style="margin-top:14px;color:var(--soft);font-size:13.5px">Sugestão: guarde no seu app de senhas (como uma nota) <b>e</b> num papel em casa. Não mande por WhatsApp nem e-mail.</p>
       <label class="chk"><input type="checkbox" id="c-guardei"> Guardei a minha chave em um lugar seguro.</label>
       <button class="btn pri" id="b-pronto" style="width:100%" disabled>Começar a usar</button>
     </div>

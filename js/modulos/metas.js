@@ -1,6 +1,6 @@
 /* =========================================================
    Sistema · módulo Metas do semestre
-   Seis pilares (Carreira, Finanças, Saúde, Relações, Lazer,
+   Quatro pilares (Carreira, Finanças, Saúde e
    Desenvolvimento). Cada meta pertence a um pilar e a um
    semestre (1º = janeiro a junho, 2º = julho a dezembro).
 
@@ -21,7 +21,7 @@ import * as avisos from '../nucleo/avisos.js';
 import { abrirFolha, fecharFolha, toast, confirmar } from '../nucleo/ui.js';
 import { esc, brl, r2, lerValor, isoDia, deIso, isoMes, somarMeses } from '../nucleo/util.js';
 import * as S from './gastos.js';
-import * as E from './entradas.js';
+import * as Ho from './honorarios.js';
 import * as H from './habitos.js';
 
 const COL = 'metas';
@@ -30,8 +30,6 @@ export const PILARES = [
   { id: 'carreira', nome: 'Carreira', cor: 'var(--g6)' },
   { id: 'financas', nome: 'Finanças', cor: 'var(--g3)' },
   { id: 'saude', nome: 'Saúde', cor: 'var(--g4)' },
-  { id: 'relacoes', nome: 'Relações', cor: 'var(--g2)' },
-  { id: 'lazer', nome: 'Lazer', cor: 'var(--g8)' },
   { id: 'desenvolvimento', nome: 'Desenvolvimento', cor: 'var(--g7)' },
 ];
 export const pilar = (id) => PILARES.find((p) => p.id === id) ?? PILARES[0];
@@ -60,8 +58,9 @@ export function andamento(sem, hoje = isoDia()) {
 const ateAgora = (sem) => sem.meses.filter((m) => m <= isoMes());
 
 export const FONTES = [
-  { id: 'entradas', nome: 'Total de entradas', unidade: 'R$', calc: (m, sem) => r2(ateAgora(sem).reduce((s, ym) => s + E.total(ym), 0)) },
-  { id: 'sobra', nome: 'Quanto sobrou (entradas − tudo que saiu)', unidade: 'R$', calc: (m, sem) => r2(ateAgora(sem).reduce((s, ym) => s + E.total(ym) - S.calcular(ym).total, 0)) },
+  { id: 'entradas', nome: 'Total de entradas', unidade: 'R$', calc: (m, sem) => r2(ateAgora(sem).reduce((s, ym) => s + Ho.totalMes(ym), 0)) },
+  { id: 'sobra', nome: 'Quanto sobrou (entradas − tudo que saiu)', unidade: 'R$', calc: (m, sem) => r2(ateAgora(sem).reduce((s, ym) => s + Ho.totalMes(ym) - S.calcular(ym).total, 0)) },
+  { id: 'honorarios', nome: 'Honorários recebidos', unidade: 'R$', calc: (m, sem) => r2(ateAgora(sem).reduce((s, ym) => s + Ho.doMesResumo(ym).honorarios, 0)) },
   { id: 'habito', nome: 'Vezes que fiz um hábito', unidade: 'vezes', calc: (m, sem) => { const h = H.lista().find((x) => x.id === m.habitoId); return h ? sem.meses.reduce((s, ym) => s + H.diasFeitos(h, ym).size, 0) : 0; } },
 ];
 const fonte = (id) => FONTES.find((f) => f.id === id);

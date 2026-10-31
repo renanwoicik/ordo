@@ -19,6 +19,7 @@ export function lerValor(texto) {
   let s = String(texto ?? '').replace(/\s|R\$/g, '');
   if (!s) return NaN;
   if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); // "1.000" é mil, não um
   return Number(s);
 }
 

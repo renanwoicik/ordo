@@ -5,12 +5,12 @@
    Concluído. Sem meta de estudo: é para não perder nada.
 
    Item (coleção "estudos"):
-     { titulo, tipo: 'curso' | 'artigo' | 'livro' | 'tema',
+     { titulo, tipo: 'pos' | 'curso' | 'artigo' | 'livro' | 'juris' | 'tema',
        status: 'quero' | 'estudando' | 'concluido',
        autor, ref (link), feito, total (aulas do curso ou páginas do livro),
-       limite: 'AAAA-MM-DD' (data limite do curso), valor (curso pago),
+       limite: 'AAAA-MM-DD' (data limite do curso), valor (curso pago), horas (de formação),
        nota (texto livre: links e trechos), concluidoEm }
-   Ligação: "lançar gasto" abre o gasto no CNPJ, categoria Educação.
+   Ligação: "lançar gasto" abre o gasto de Trabalho, categoria Educação.
    ========================================================= */
 
 import * as dados from '../nucleo/dados.js';
@@ -22,12 +22,14 @@ import * as S from './gastos.js';
 const COL = 'estudos';
 
 export const TIPOS = [
-  { id: 'curso', nome: 'Curso', plural: 'Cursos', cor: 'var(--g6)', unidade: 'aulas' },
+  { id: 'pos', nome: 'Pós-graduação', plural: 'Pós', cor: 'var(--g8)', unidade: 'aulas', curso: true },
+  { id: 'curso', nome: 'Curso', plural: 'Cursos', cor: 'var(--g6)', unidade: 'aulas', curso: true },
   { id: 'artigo', nome: 'Artigo', plural: 'Artigos', cor: 'var(--g5)' },
   { id: 'livro', nome: 'Livro', plural: 'Livros', cor: 'var(--g3)', unidade: 'páginas' },
+  { id: 'juris', nome: 'Jurisprudência', plural: 'Jurisprudência', cor: 'var(--g2)' },
   { id: 'tema', nome: 'Tema para pesquisar', plural: 'Temas', cor: 'var(--g7)' },
 ];
-export const tipo = (id) => TIPOS.find((t) => t.id === id) ?? TIPOS[3];
+export const tipo = (id) => TIPOS.find((t) => t.id === id) ?? TIPOS.at(-1);
 
 export const STATUS = [
   { id: 'quero', nome: 'Quero estudar' },
@@ -61,7 +63,7 @@ export async function somarProgresso(e, n = 1) {
   toast(acabou ? 'Concluído ✦' : `${feito} de ${e.total}`);
 }
 
-/** Abre o gasto de um curso pago, já no CNPJ e na categoria Educação. */
+/** Abre o gasto de um curso pago, já em Trabalho e na categoria Educação. */
 export function lancarGasto(e) {
   S.abrirGasto(null, { prefill: { desc: e.titulo, valor: Number(e.valor) || '', conta: 'CNPJ', cat: 'Educação' } });
 }
@@ -72,11 +74,11 @@ const numBR = (v) => (v == null || v === '' || Number(v) === 0 ? '' : String(r2(
 
 export function abrirEstudo(item = null, { prefill = {} } = {}) {
   const novo = !item;
-  const a = item ? { ...item } : { titulo: '', tipo: 'curso', status: 'quero', autor: '', ref: '', feito: '', total: '', limite: '', valor: '', nota: '', ...prefill };
+  const a = item ? { ...item } : { titulo: '', tipo: 'curso', status: 'quero', autor: '', ref: '', feito: '', total: '', limite: '', valor: '', horas: '', nota: '', ...prefill };
   const f = abrirFolha(`
     <h3>${novo ? 'Novo' : 'Editar'} estudo</h3>
     <form id="f-estudo" novalidate>
-      <div class="fld"><label for="e-titulo">Título</label><input id="e-titulo" value="${esc(a.titulo)}" placeholder="Ex.: curso de atualização" autocomplete="off" autofocus></div>
+      <div class="fld"><label for="e-titulo">Título</label><input id="e-titulo" value="${esc(a.titulo)}" placeholder="Ex.: pós em direito imobiliário" autocomplete="off" autofocus></div>
       <div class="fld"><span class="l">Tipo</span><div class="opcoes" id="e-tipo">${TIPOS.map((t) => `<button type="button" data-v="${t.id}" aria-pressed="${t.id === a.tipo}"><span class="dot" style="background:${t.cor};margin:0"></span>${t.nome}</button>`).join('')}</div></div>
       <div class="fld"><span class="l">Em que ponto está</span><div class="opcoes" id="e-status">${STATUS.map((s) => `<button type="button" data-v="${s.id}" aria-pressed="${s.id === a.status}">${s.nome}</button>`).join('')}</div></div>
       <div class="fld"><label for="e-autor">Autor ou instituição (opcional)</label><input id="e-autor" value="${esc(a.autor || '')}" autocomplete="off"></div>
@@ -89,10 +91,11 @@ export function abrirEstudo(item = null, { prefill = {} } = {}) {
         <div class="fld"><label for="e-limite">Data limite (opcional)</label><input id="e-limite" type="date" value="${esc(a.limite || '')}"></div>
         <div class="fld"><label for="e-valor">Valor, se for pago</label><input id="e-valor" inputmode="decimal" value="${numBR(a.valor)}" placeholder="R$ 0,00" autocomplete="off"></div>
       </div>
+      <div class="fld" id="e-horas-c"><label for="e-horas">Horas de formação (opcional)</label><input id="e-horas" type="number" min="0" inputmode="numeric" value="${esc(a.horas ?? '')}"></div>
       <div class="fld"><label for="e-nota">Anotações</label><textarea id="e-nota" rows="4" placeholder="Links, trechos, o que aprendeu…">${esc(a.nota || '')}</textarea></div>
       <div class="erro" id="e-erro" role="alert"></div>
       <div class="opcoes acoes-tarefa">
-        <button type="button" data-acao="gasto" id="e-gasto" hidden>Lançar gasto no CNPJ</button>
+        <button type="button" data-acao="gasto" id="e-gasto" hidden>Lançar gasto de trabalho</button>
         ${novo ? '' : '<button type="button" data-acao="apagar" class="perigo">Apagar</button>'}
       </div>
       <div class="acts"><button type="button" class="btn sec" data-fechar>Cancelar</button><button type="submit" class="btn pri">Salvar</button></div>
@@ -110,8 +113,9 @@ export function abrirEstudo(item = null, { prefill = {} } = {}) {
     $('#e-prog').hidden = !t.unidade;
     $('#e-feito-l').textContent = t.unidade === 'páginas' ? 'Páginas lidas' : 'Aulas feitas';
     $('#e-total-l').textContent = t.unidade === 'páginas' ? 'Total de páginas' : 'Total de aulas';
-    $('#e-curso').hidden = t.id !== 'curso';
-    $('#e-gasto').hidden = !(t.id === 'curso' && lerValor($('#e-valor').value) > 0);
+    $('#e-curso').hidden = !t.curso;
+    $('#e-horas-c').hidden = !t.curso;
+    $('#e-gasto').hidden = !(t.curso && lerValor($('#e-valor').value) > 0);
   };
   unico('#e-tipo', atualizar); unico('#e-status');
   $('#e-valor').addEventListener('input', atualizar);
@@ -126,7 +130,7 @@ export function abrirEstudo(item = null, { prefill = {} } = {}) {
     return {
       ...a, titulo: $('#e-titulo').value.trim(), tipo: t.id, status, autor: $('#e-autor').value.trim(), ref: $('#e-ref').value.trim(),
       feito: t.unidade ? lerNum('#e-feito') : '', total: t.unidade ? lerNum('#e-total') : '',
-      limite: t.id === 'curso' ? $('#e-limite').value : '', valor: t.id === 'curso' && Number.isFinite(v) && v > 0 ? r2(v) : '',
+      limite: t.curso ? $('#e-limite').value : '', valor: t.curso && Number.isFinite(v) && v > 0 ? r2(v) : '', horas: t.curso ? lerNum('#e-horas') : '',
       nota: $('#e-nota').value.trim(),
       concluidoEm: status === 'concluido' ? (a.concluidoEm || isoDia()) : null,
     };

@@ -51,6 +51,10 @@ export const dataCurta = (iso) => `${NOMES_DIAS[(deIso(iso).getDay() + 6) % 7]},
 const dataBR = (iso) => (iso ? iso.split('-').reverse().join('/') : '');
 const diasAte = (iso, hoje = isoDia()) => Math.round((deIso(iso) - deIso(hoje)) / 86400000);
 
+/** Outros módulos acrescentam à ficha: { html(c), clique(d, trocar, c), apagar(c), texto(c) }. */
+const extras = [];
+export const registrarExtraFicha = (x) => extras.push(x);
+
 /* =========================================================
    LEITURA E CÁLCULOS
    ========================================================= */
@@ -156,6 +160,7 @@ function textoDoCliente(c) {
   for (const k of casosDe(c.id)) linhas.push(`- ${k.titulo} (${nomeTipoCaso(k.tipo)}, ${k.materia || 'sem matéria'}, ${nomeSituacao(k.situacao)})${k.numero ? ` nº ${k.numero}` : ''}`);
   linhas.push('', 'Prazos:');
   for (const p of prazosDe(c.id)) linhas.push(`- ${dataBR(p.data)}: ${p.descricao} (${p.status === 'cumprido' ? 'cumprido' : 'aberto'})`);
+  for (const x of extras) linhas.push(...x.texto(c));
   return linhas.join('\n');
 }
 
@@ -172,6 +177,7 @@ async function exportarCliente(c) {
 }
 
 async function apagarCliente(c) {
+  for (const x of extras) await x.apagar(c);
   for (const p of prazosDe(c.id)) await dados.apaga(COL_P, p.id);
   for (const k of casosDe(c.id)) await dados.apaga(COL_C, k.id);
   await dados.apaga(COL, c.id);
@@ -354,6 +360,8 @@ export function abrirFicha(id) {
           : '<div class="vazio" style="text-align:left;padding:4px 0">Nenhum caso cadastrado.</div>'}
       </div>
 
+      ${extras.map((x) => x.html(c)).join('')}
+
       <div class="opcoes" style="margin:0 0 18px">
         <button type="button" data-acao="caso">${icone.soma(14)} Caso</button>
         <button type="button" data-acao="prazo">${icone.soma(14)} Prazo</button>
@@ -373,6 +381,7 @@ export function abrirFicha(id) {
     if (!b) return;
     const d = b.dataset;
     const trocar = (fn) => { fecharFolha(); setTimeout(fn, 260); };
+    if (extras.some((x) => x.clique(d, trocar, c))) return;
     if (d.prazo) trocar(() => abrirPrazo(dados.pega(COL_P, d.prazo)));
     else if (d.caso) trocar(() => abrirCaso(pegaCaso(d.caso)));
     else if (d.acao === 'caso') trocar(() => abrirCaso(null, { clienteId: id }));
@@ -381,7 +390,7 @@ export function abrirFicha(id) {
     else if (d.acao === 'exportar') exportarCliente(c);
     else if (d.acao === 'apagar') {
       fecharFolha();
-      if (await confirmar({ titulo: 'Apagar cliente?', texto: `${esc(c.nome)}, ${plural(lista.length, 'caso', 'casos')} e ${plural(prazosDe(id).length, 'prazo', 'prazos')}. Não dá para desfazer, salvo por um backup antigo.`, ok: 'Apagar tudo', perigo: true })) {
+      if (await confirmar({ titulo: 'Apagar cliente?', texto: `${esc(c.nome)}, ${plural(lista.length, 'caso', 'casos')} , ${plural(prazosDe(id).length, 'prazo', 'prazos')} e os honorários dele. Não dá para desfazer, salvo por um backup antigo.`, ok: 'Apagar tudo', perigo: true })) {
         await apagarCliente(c);
         toast('Cliente apagado.');
       }

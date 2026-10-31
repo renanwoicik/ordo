@@ -13,8 +13,8 @@ import * as R from '../modulos/revisao.js';
 import * as T from '../modulos/tarefas.js';
 import * as M from '../modulos/metas.js';
 
-const PASSOS = ['Como foi a semana', 'Dinheiro', 'Hábitos e metas', 'Pendências', 'Próxima semana'];
-const estado = { segunda: segundaDaSemana(), passo: 0, resp: { certo: '', melhorar: '', prioridades: '' }, carregada: null };
+const PASSOS = ['Como foi a semana', 'Dinheiro', 'Hábitos e metas', 'Pendências', 'Semana que começa'];
+const estado = { segunda: R.semanaARevisar(), passo: 0, resp: { certo: '', melhorar: '', prioridades: '' }, carregada: null };
 let ultimo = null;
 
 const curto = (v) => (Math.abs(v) >= 1000 ? brl(Math.round(v)).replace(/,00$/, '') : brl(v).replace(/,00$/, ''));
@@ -45,9 +45,9 @@ export function desenhar(el) {
         <button type="button" class="redondo" data-sem="-7" aria-label="Semana anterior">${icone.voltar(18)}</button>
         <span style="font-weight:500">${diaMes(estado.segunda)} a ${diaMes(d.dom)}</span>
         <button type="button" class="redondo" data-sem="7" aria-label="Próxima semana">${icone.seta(18)}</button>
-        ${estado.segunda !== segundaDaSemana() ? '<button type="button" class="link-mini" data-sem="hoje">esta semana</button>' : ''}
+        ${estado.segunda !== R.semanaARevisar() ? '<button type="button" class="link-mini" data-sem="hoje">última semana</button>' : ''}
       </div>
-      <div class="chips"><button type="button" class="chip" data-lembrete-dom>Lembrete de domingo</button>
+      <div class="chips"><button type="button" class="chip" data-lembrete-seg>Lembrete de segunda</button>
       ${feita ? `<span class="chip pos">${icone.check(12)} concluída em ${dataHora(feita.concluidaEm).split(' às')[0]}</span>` : '<span class="chip">em andamento</span>'}</div>
     </div>
 
@@ -85,10 +85,10 @@ function passo2(d) {
     <div class="grade g-kpi">
       ${kpi({ rot: 'Entradas da semana', valor: curto(d.entradasTotal), sub: plural(d.entradas.length, 'lançamento', 'lançamentos') })}
       ${kpi({ rot: 'Gastos lançados', valor: curto(d.gastosTotal), sub: plural(d.gastos.length, 'gasto', 'gastos') })}
-      ${kpi({ rot: 'Para revisar', valor: d.paraRevisar, sub: 'CPF ou CNPJ?' })}
+      ${kpi({ rot: 'Para revisar', valor: d.paraRevisar, sub: 'pessoal ou trabalho?' })}
       ${kpi({ rot: 'Sobra do mês', valor: curto(d.entrouMes - d.saiuMes), sub: `entrou ${curto(d.entrouMes)} · saiu ${curto(d.saiuMes)}` })}
     </div>
-    ${d.paraRevisar ? `<div class="alert warn"><span class="d"></span><div>${plural(d.paraRevisar, 'gasto', 'gastos')} para decidir se é CPF ou CNPJ. <a href="#/dinheiro/gastos" style="font-weight:600">Revisar agora</a></div></div>` : ''}
+    ${d.paraRevisar ? `<div class="alert warn"><span class="d"></span><div>${plural(d.paraRevisar, 'gasto', 'gastos')} para decidir se é pessoal ou do trabalho. <a href="#/dinheiro/gastos" style="font-weight:600">Revisar agora</a></div></div>` : ''}
     <small style="color:var(--soft)">Para mexer em algo, abra <a href="#/dinheiro" style="font-weight:600">Dinheiro</a>.</small>`;
 }
 
@@ -123,7 +123,7 @@ function passo5(d) {
       ${kpi({ rot: 'Prazos na semana', valor: x.prazosProc.length + x.prazos.length + x.vencimentos.length, sub: 'processuais, tarefas e vencimentos' })}
     </div>
     ${x.prazosProc.length || x.prazos.length || x.vencimentos.length ? `<div class="rot" style="margin:8px 0 6px">Prazos e vencimentos</div><div class="linhas">${x.prazosProc.map((p) => `<div class="linha"><span class="tx"><b>${esc(p.descricao)}</b><small>prazo · ${diaMes(p.data)}</small></span></div>`).join('')}${x.prazos.map((t) => `<div class="linha"><span class="tx"><b>${esc(t.titulo)}</b><small>tarefa · prazo ${diaMes(t.prazo)}</small></span></div>`).join('')}${x.vencimentos.map((v) => `<div class="linha"><span class="tx"><b>${esc(v.nome)}</b><small>vencimento · ${diaMes(v.data)}</small></span></div>`).join('')}</div>` : ''}
-    <div class="fld" style="margin-top:12px"><label for="r-prior">Minhas 3 prioridades da próxima semana</label><textarea id="r-prior" rows="3" placeholder="1. …&#10;2. …&#10;3. …">${esc(estado.resp.prioridades)}</textarea></div>
+    <div class="fld" style="margin-top:12px"><label for="r-prior">Minhas 3 prioridades desta semana</label><textarea id="r-prior" rows="3" placeholder="1. …&#10;2. …&#10;3. …">${esc(estado.resp.prioridades)}</textarea></div>
     <div class="chips"><a class="btn sec" href="#/rotina/tarefas">${icone.rotina(16)} Planejar na Rotina</a><button type="button" class="btn sec" data-copiar>${icone.ideia(16)} Copiar a semana para o Claude</button></div>`;
 }
 
@@ -159,7 +159,7 @@ function ligar(el, d) {
     const b = e.target.closest('button');
     if (!b) return;
     const k = b.dataset;
-    if (k.sem) { estado.segunda = k.sem === 'hoje' ? segundaDaSemana() : somarDias(estado.segunda, Number(k.sem)); estado.passo = 0; redesenhar(); }
+    if (k.sem) { estado.segunda = k.sem === 'hoje' ? R.semanaARevisar() : somarDias(estado.segunda, Number(k.sem)); estado.passo = 0; redesenhar(); }
     else if (k.passo !== undefined) { estado.passo = Number(k.passo); redesenhar(); window.scrollTo(0, 0); }
     else if (k.irPasso) { estado.passo = Math.max(0, Math.min(PASSOS.length - 1, estado.passo + Number(k.irPasso))); redesenhar(); window.scrollTo(0, 0); }
     else if (k.concluir !== undefined) {
@@ -168,7 +168,7 @@ function ligar(el, d) {
     }
     else if (k.mover) { const t = T.todas().find((x) => x.id === k.mover); if (t) { await T.moverPara(t, d.prox); toast(`Tarefa movida para ${diaMes(d.prox)}.`); } }
     else if (k.tarefa) T.abrirTarefa(T.todas().find((x) => x.id === k.tarefa));
-    else if (k.lembreteDom !== undefined) R.abrirLembreteDomingo();
+    else if (k.lembreteSeg !== undefined) R.abrirLembreteSegunda();
     else if (k.rev) abrirRevisaoSalva(R.todas().find((r) => r.id === k.rev));
     else if (k.copiar !== undefined) {
       try { await navigator.clipboard.writeText(T.textoDaSemana(d.prox)); toast('Copiado. Cole no chat com o Claude ✦'); }

@@ -12,7 +12,7 @@
 import { abrirFolha, fecharFolha, toast } from '../nucleo/ui.js';
 import { brl, r2, isoDia, somarMeses, mesPorExtenso } from '../nucleo/util.js';
 import * as S from './gastos.js';
-import * as E from './entradas.js';
+import * as Ho from './honorarios.js';
 
 const pct = (a, b) => (b > 0 ? `${Math.round((a / b) * 100)}%` : '—');
 const mesCurto = (ym) => `${mesPorExtenso(ym).slice(0, 3)}/${ym.slice(2, 4)}`;
@@ -29,26 +29,26 @@ export function mesesDoPeriodo(opcao, hoje = isoDia()) {
 export function montarRelatorio(opcao = 'ano', hoje = isoDia()) {
   const meses = mesesDoPeriodo(opcao, hoje);
   const linhas = meses.map((ym) => {
-    const s = S.calcular(ym), entrou = E.total(ym);
-    return [mesCurto(ym), brl(entrou), brl(s.totalFixasCNPJ), brl(r2(entrou - s.totalFixasCNPJ)), brl(s.cpf), brl(s.cnpj), brl(r2(entrou - s.total)), pct(entrou - s.total, entrou)];
+    const s = S.calcular(ym), de = Ho.doMesResumo(ym), entrou = de.total;
+    return [mesCurto(ym), brl(de.salario), brl(de.parcelas), brl(de.exito), brl(de.outras), brl(entrou), brl(s.totalFixasCNPJ), brl(r2(entrou - s.totalFixasCNPJ)), brl(s.cpf), brl(s.cnpj), brl(r2(entrou - s.total)), pct(entrou - s.total, entrou)];
   });
   const porCategoria = {};
   for (const ym of meses) for (const c of S.calcular(ym).categorias) porCategoria[c.rotulo] = r2((porCategoria[c.rotulo] || 0) + c.valor);
   const categorias = Object.entries(porCategoria).sort((a, b) => b[1] - a[1]).map(([n, v]) => [n, brl(v)]);
 
   return [
-    'Você é um consultor financeiro para profissionais autônomos. Analise os dados abaixo e responda em português, de forma direta e prática:',
+    'Você é um consultor financeiro para advogados em início de carreira, com salário fixo e clientes próprios. Analise os dados abaixo e responda em português, de forma direta e prática:',
     '1. **Evolução:** o que mudou mês a mês nas entradas, nos gastos e nas sobras.',
-    '2. **Pontos de atenção:** custos fixos, categorias que mais pesam, meses fora do padrão.',
+    '2. **Pontos de atenção:** dependência do salário, parcelas em atraso, custos fixos, categorias que mais pesam, meses fora do padrão.',
     '3. **Cinco sugestões de mudança**, em ordem de prioridade, cada uma com o que fazer, o que esperar e como medir.',
     '4. **O que falta saber:** quais dados ou perguntas ajudariam a melhorar a análise.',
     '',
     `Os dados saíram do meu sistema de gestão em ${hoje}. Estão anonimizados: só números agrupados. Valores em reais.`,
     '',
     `## Financeiro por mês (${mesCurto(meses[0])} a ${mesCurto(meses.at(-1))})`,
-    tabela(['Mês', 'Entrou', 'Contas fixas CNPJ', 'Ganho líquido', 'Gastos CPF', 'Gastos CNPJ', 'Sobrou', 'Sobra/Entrou'], linhas),
+    tabela(['Mês', 'Salário', 'Honorários', 'Êxito', 'Outras', 'Entrou', 'Contas fixas de trabalho', 'Ganho líquido', 'Gastos pessoais', 'Gastos de trabalho', 'Sobrou', 'Sobra/Entrou'], linhas),
     '',
-    '"Gastos CNPJ" já inclui as contas fixas CNPJ. "Sobrou" = entrou − gastos CPF − gastos CNPJ.',
+    `"Gastos de trabalho" já inclui as contas fixas de trabalho. "Sobrou" = entrou − gastos pessoais − gastos de trabalho. A receber hoje: ${brl(r2(Ho.emAberto().reduce((s, x) => s + Number(x.p.valor), 0)))}, dos quais ${brl(r2(Ho.atrasadas(hoje).reduce((s, x) => s + Number(x.p.valor), 0)))} em atraso.`,
     '',
     '## Gastos do período por categoria',
     categorias.length ? tabela(['Categoria', 'Total'], categorias) : 'Sem gastos no período.',

@@ -18,8 +18,8 @@ import { segundaDaSemana } from '../nucleo/util.js';
 
 const PARTES = [
   { rota: 'estudos', nome: 'Estudos', desc: 'Cursos, artigos, livros e temas', icone: icone.estudos, chips: () => `<span class="chip">${Es.doStatus('estudando').length} estudando</span><span class="chip">${Es.doStatus('quero').length} na fila</span>`, tela: estudosTela },
-  { rota: 'vencimentos', nome: 'Vencimentos', desc: 'Anuidade, certificado, CNH, IPVA…', icone: icone.vencimentos, chips: () => { const n = V.todos().filter((v) => { const s = V.status(v); return s.dias != null && s.dias <= 30; }).length; return n ? `<span class="chip neg">${n} vencendo</span>` : `<span class="chip">${V.todos().length ? 'tudo em dia' : 'nada cadastrado'}</span>`; }, tela: vencimentosTela },
-  { rota: 'revisao', nome: 'Revisão semanal', desc: 'Domingo, 10 minutos', icone: icone.revisao, chips: () => `<span class="chip ${Rv.daSemana(segundaDaSemana()) ? 'pos' : ''}">${Rv.daSemana(segundaDaSemana()) ? 'feita nesta semana' : 'próxima: domingo'}</span>`, tela: revisaoTela },
+  { rota: 'vencimentos', nome: 'Vencimentos', desc: 'OAB, certificado, CNH, IPVA, seguro…', icone: icone.vencimentos, chips: () => { const n = V.todos().filter((v) => { const s = V.status(v); return s.dias != null && s.dias <= 30; }).length; return n ? `<span class="chip neg">${n} vencendo</span>` : `<span class="chip">${V.todos().length ? 'tudo em dia' : 'nada cadastrado'}</span>`; }, tela: vencimentosTela },
+  { rota: 'revisao', nome: 'Revisão semanal', desc: 'Segunda, 10 minutos', icone: icone.revisao, chips: () => `<span class="chip ${Rv.daSemana(Rv.semanaARevisar()) ? 'pos' : ''}">${Rv.daSemana(Rv.semanaARevisar()) ? 'feita nesta semana' : 'próxima: segunda'}</span>`, tela: revisaoTela },
   { rota: 'ajustes', nome: 'Ajustes e backup', desc: 'Senha, aparência, backup', icone: icone.ajustes, chips: () => '', tela: ajustes },
 ];
 

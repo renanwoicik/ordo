@@ -85,7 +85,8 @@
 
 /* ---------- cor de cada área (tarefas, avisos, etiquetas) ---------- */
 :root{
-  --area-trabalho:var(--g1);
+  --area-escritorio:var(--g1);
+  --area-clientes:var(--g5);
   --area-estudos:var(--g6);
   --area-pessoal:var(--g4);
 }

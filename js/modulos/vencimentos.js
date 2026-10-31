@@ -1,6 +1,6 @@
 /* =========================================================
    Sistema · módulo Vencimentos
-   Tudo o que tem data para renovar ou pagar: anuidade profissional,
+   Tudo o que tem data para renovar ou pagar: anuidade da OAB,
    certificado digital, CNH, IPVA e licenciamento, seguros,
    contratos. O sistema avisa antes de vencer.
 
@@ -33,9 +33,9 @@ export const nomeRecorrencia = (id) => RECORRENCIAS.find((r) => r[0] === id)?.[1
 
 /** Atalhos para cadastrar rápido (só preenchem o formulário; nada é criado sozinho). */
 export const SUGESTOES = [
-  ['Anuidade profissional', 'profissional', 'anual'], ['Certificado digital', 'profissional', 'anual'], ['CNH', 'pessoal', 'nenhuma'],
+  ['Anuidade da OAB', 'profissional', 'anual'], ['Certificado digital', 'profissional', 'anual'], ['CNH', 'pessoal', 'nenhuma'],
   ['IPVA', 'veiculo', 'anual'], ['Licenciamento do carro', 'veiculo', 'anual'], ['Seguro do carro', 'seguros', 'anual'],
-  ['Seguro de vida', 'seguros', 'anual'], ['Contrato de aluguel', 'seguros', 'anual'],
+  ['Financiamento do carro', 'veiculo', 'mensal'], ['Multa de trânsito', 'veiculo', 'nenhuma'],
 ];
 
 export const todos = () => dados.lista(COL).sort((a, b) => (a.data || '9999').localeCompare(b.data || '9999'));
@@ -105,7 +105,7 @@ export function abrirVencimento(venc = null, { prefill = {}, renovando = false }
     <h3>${renovando ? 'Nova data de' : novo ? 'Novo' : 'Editar'} vencimento</h3>
     ${renovando ? `<p class="sub"><strong>${esc(a.nome)}</strong> não se repete sozinho: escolha a data do próximo vencimento.</p>` : ''}
     <form id="f-venc" novalidate>
-      <div class="fld"><label for="v-nome">O que vence</label><input id="v-nome" value="${esc(a.nome)}" placeholder="Ex.: anuidade profissional" autocomplete="off" ${renovando ? '' : 'autofocus'}></div>
+      <div class="fld"><label for="v-nome">O que vence</label><input id="v-nome" value="${esc(a.nome)}" placeholder="Ex.: anuidade da OAB" autocomplete="off" ${renovando ? '' : 'autofocus'}></div>
       <div class="fld"><span class="l">Categoria</span><div class="opcoes" id="v-cat">${CATEGORIAS.map((c) => `<button type="button" data-v="${c.id}" aria-pressed="${c.id === a.categoria}"><span class="dot" style="background:${c.cor};margin:0"></span>${c.nome}</button>`).join('')}</div></div>
       <div class="par">
         <div class="fld"><label for="v-data">Vence em</label><input id="v-data" type="date" value="${esc(a.data || '')}" ${renovando ? 'autofocus' : ''}></div>

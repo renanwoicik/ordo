@@ -21,6 +21,7 @@ export function desenhar(el) {
   const filtro = (l) => (estado.tipo === 'todos' ? l : l.filter((e) => e.tipo === estado.tipo));
   const ano = hoje.slice(0, 4);
   const concluidosAno = todos.filter((e) => e.status === 'concluido' && (e.concluidoEm || '').startsWith(ano)).length;
+  const horasAno = todos.filter((e) => e.status === 'concluido' && (e.concluidoEm || '').startsWith(ano)).reduce((s, e) => s + (Number(e.horas) || 0), 0);
   const comPrazo = todos.filter((e) => e.limite && e.status !== 'concluido').sort((a, b) => a.limite.localeCompare(b.limite))[0];
 
   const card = (e) => {
@@ -36,7 +37,7 @@ export function desenhar(el) {
         ${e.nota ? '<span class="chip">com anotação</span>' : ''}
       </div>
       <div class="chips">
-        ${e.status === 'estudando' && t.id === 'curso' && Number(e.total) > 0 ? `<button type="button" class="chip acc" data-mais="${e.id}">+1 aula</button>` : ''}
+        ${e.status === 'estudando' && t.curso && Number(e.total) > 0 ? `<button type="button" class="chip acc" data-mais="${e.id}">+1 aula</button>` : ''}
         ${e.status !== 'concluido' ? `<button type="button" class="chip" data-avancar="${e.id}">${e.status === 'quero' ? 'começar' : 'concluir'} ${icone.seta(12)}</button>` : ''}
         ${e.ref ? `<a class="chip" href="${esc(e.ref)}" target="_blank" rel="noopener">abrir link</a>` : ''}
       </div>
@@ -56,7 +57,7 @@ export function desenhar(el) {
     <div class="grade g-kpi">
       ${kpi({ rot: 'Estudando', valor: E.doStatus('estudando').length, sub: 'em andamento' })}
       ${kpi({ rot: 'Quero estudar', valor: E.doStatus('quero').length, sub: 'na fila' })}
-      ${kpi({ rot: `Concluídos em ${ano}`, valor: concluidosAno, sub: 'neste ano' })}
+      ${kpi({ rot: `Concluídos em ${ano}`, valor: concluidosAno, sub: horasAno ? `${horasAno} horas de formação` : 'neste ano' })}
       ${kpi({ rot: 'Próxima data limite', valor: comPrazo ? diaMes(comPrazo.limite) : '—', sub: comPrazo ? esc(comPrazo.titulo) : 'nenhum curso com prazo' })}
     </div>
     <div class="filtros">

@@ -24,7 +24,8 @@ import { esc, isoDia, somarDias, segundaDaSemana, diasDaSemana, NOMES_DIAS, dura
 const COL = 'tarefas';
 
 export const AREAS = [
-  { id: 'trabalho', nome: 'Trabalho' },
+  { id: 'escritorio', nome: 'Escritório' },
+  { id: 'clientes', nome: 'Clientes próprios' },
   { id: 'estudos', nome: 'Estudos' },
   { id: 'pessoal', nome: 'Pessoal' },
 ];
@@ -113,7 +114,7 @@ function grupo(el, aoMudar) {
  */
 export function abrirTarefa(tarefa = null, { dia, area } = {}) {
   const nova = !tarefa;
-  const t = tarefa ? { ...tarefa } : { titulo: '', area: area || 'trabalho', dia: dia === undefined ? isoDia() : dia, prazo: '', tempo: 30, importante: false, nota: '', status: 'aberta' };
+  const t = tarefa ? { ...tarefa } : { titulo: '', area: area || 'escritorio', dia: dia === undefined ? isoDia() : dia, prazo: '', tempo: 30, importante: false, nota: '', status: 'aberta' };
   const tempoOutro = TEMPOS.includes(Number(t.tempo)) ? '' : t.tempo;
 
   const f = abrirFolha(`

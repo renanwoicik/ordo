@@ -11,7 +11,7 @@
 
 importScripts('config.js');
 
-const VERSAO = `${self.CONFIG.id}-v1`;
+const VERSAO = `${self.CONFIG.id}-v2`;
 
 const ARQUIVOS = [
   './',
@@ -43,6 +43,7 @@ const ARQUIVOS = [
   'js/modulos/gastos.js',
   'js/modulos/entradas.js',
   'js/modulos/clientes.js',
+  'js/modulos/honorarios.js',
   'js/modulos/compromissos.js',
   'js/modulos/metas.js',
   'js/modulos/vencimentos.js',

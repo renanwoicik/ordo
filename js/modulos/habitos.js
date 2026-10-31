@@ -26,10 +26,10 @@ export const cor = (h) => CORES[(Number(h.cor) || 0) % CORES.length];
 
 /* Hábitos combinados na entrevista: criados uma única vez, no primeiro acesso. */
 const INICIAIS = [
-  { nome: 'Academia', freq: { tipo: 'semana', vezes: 3 }, cor: 0 },
-  { nome: 'Beber 2 L de água', freq: { tipo: 'diario' }, cor: 1 },
+  { nome: 'Medicamentos', freq: { tipo: 'diario' }, cor: 0 },
+  { nome: 'Treino', freq: { tipo: 'semana', vezes: 3 }, cor: 1 },
   { nome: 'Leitura', freq: { tipo: 'diario' }, cor: 2 },
-  { nome: 'Dormir antes da meia-noite', freq: { tipo: 'diario' }, cor: 3 },
+  { nome: 'Estudos', freq: { tipo: 'diario' }, cor: 3 },
 ];
 
 let criando = false; // evita criar duas vezes se duas telas chamarem ao mesmo tempo
@@ -155,7 +155,7 @@ export function abrirHabito(habito = null) {
         <div class="opcoes" id="h-cor">${CORES.map((c, i) => `<button type="button" class="amostra" data-v="${i}" aria-pressed="${Number(h.cor) === i}" aria-label="Cor ${i + 1}" style="--c:${c}"></button>`).join('')}</div></div>
       <div class="fld"><label for="h-hora">Lembrete (opcional)</label>
         <input id="h-hora" type="time" value="${esc(h.lembrete || '')}">
-        <small>O aviso é criado no Calendário do iPhone ou do Mac, que é quem toca na hora certa.</small></div>
+        <small>O aviso é criado no calendário do aparelho, que é quem toca na hora certa.</small></div>
       <div class="erro" id="h-erro" role="alert"></div>
       ${novo ? '' : '<div class="opcoes acoes-tarefa"><button type="button" data-acao="arquivar" class="perigo">Remover hábito</button></div>'}
       <div class="acts">

@@ -1,7 +1,7 @@
 /* =========================================================
    Sistema · Ajustes e backup
    Aparência, segurança (senha, bloqueio, chave de
-   recuperação), backup/restauração e instalação no iPhone.
+   recuperação), backup/restauração e instalação nos aparelhos.
    ========================================================= */
 
 import { MARCA } from '../nucleo/marca.js';
@@ -12,6 +12,7 @@ import * as nuvem from '../nucleo/sincronia.js';
 import * as V from '../modulos/vencimentos.js';
 import * as R from '../modulos/revisao.js';
 import * as H from '../modulos/habitos.js';
+import * as K from '../modulos/clientes.js';
 import { abrirFolha, fecharFolha, confirmar, toast, icone, cabecalho } from '../nucleo/ui.js';
 import { pref, dataHora, diasDesde, esc } from '../nucleo/util.js';
 import { htmlChave, ligarBotoesChave } from './bloqueio.js';
@@ -59,7 +60,7 @@ export function desenhar(el) {
         <div class="fld" style="margin:0"><span class="l" id="l-tema">Modo de cor</span>
           <div class="seg" role="group" aria-labelledby="l-tema">${TEMAS.map(([v, n]) =>
             `<button type="button" data-tema="${v}" aria-pressed="${tema === v}">${n}</button>`).join('')}</div>
-          <small>“Automático” segue o modo claro/escuro do seu iPhone ou Mac.</small>
+          <small>“Automático” segue o modo claro/escuro do seu aparelho.</small>
         </div>
       </div>
     </section>
@@ -80,19 +81,20 @@ export function desenhar(el) {
           ? `${item('nuvem-agora', icone.nuvem, 'Sincronizar agora', `${esc(textoNuvem)} · ${esc(nv.email || '')}`)}
              ${item('nuvem-desligar', icone.celular, 'Desligar neste aparelho', 'Os dados daqui e os da nuvem continuam onde estão')}`
           : nuvem.configurada()
-            ? item('nuvem-ligar', icone.nuvem, 'Ligar a sincronização', 'Mac e iPhone com os mesmos dados, embaralhados na nuvem')
+            ? item('nuvem-ligar', icone.nuvem, 'Ligar a sincronização', 'Celular e computador com os mesmos dados, embaralhados na nuvem')
             : '<div class="vazio" style="text-align:left">Ainda não configurada neste sistema (falta o projeto Supabase no config.js).</div>'}
       </div>
     </section>
 
     <section>
-      <h2>Lembretes no iPhone</h2>
+      <h2>Alarmes no calendário</h2>
       <div class="lista">
         ${item('lembrete-venc', icone.vencimentos, 'Vencimentos', 'Avisa antes de cada vencimento, na véspera e no dia')}
-        ${item('lembrete-dom', icone.revisao, 'Revisão de domingo', 'Todo domingo, no horário que você escolher')}
+        ${item('lembrete-prazos', icone.relogio, 'Prazos', 'Sem nome de cliente, antes de cada prazo e no dia')}
+        ${item('lembrete-seg', icone.revisao, 'Revisão de segunda', 'Toda segunda, no horário que você escolher')}
         ${item('lembrete-hab', icone.rotina, 'Hábitos', 'Os hábitos que têm horário de lembrete')}
       </div>
-      <p class="sub" style="margin:8px 4px 0;font-size:12.5px">Os lembretes entram no app Calendário do iPhone, que avisa sozinho mesmo com o ${MARCA.nome} fechado. Nada sai do seu aparelho. Adicionar de novo atualiza, não duplica.</p>
+      <p class="sub" style="margin:8px 4px 0;font-size:12.5px">Os alarmes entram no calendário do aparelho, que avisa sozinho mesmo com o ${MARCA.nome} fechado. Nada sai do seu aparelho. Adicionar de novo atualiza, não duplica.</p>
     </section>
 
     <section>
@@ -114,7 +116,7 @@ export function desenhar(el) {
     <section>
       <h2>Aparelhos</h2>
       <div class="lista">
-        ${item('instalar', icone.celular, 'Instalar no iPhone', 'Ícone na tela de início, funciona sem internet')}
+        ${item('instalar', icone.celular, 'Instalar no aparelho', 'iPhone e Windows, funciona sem internet')}
         ${item('sobre', icone.cadeado, 'Onde ficam os meus dados', `${total} ${total === 1 ? 'item guardado' : 'itens guardados'} neste aparelho`)}
       </div>
     </section>
@@ -156,7 +158,8 @@ export function desenhar(el) {
     else if (acao === 'nuvem-agora') sincronizarAgora(el);
     else if (acao === 'nuvem-desligar') desligarNuvem(el);
     else if (acao === 'lembrete-venc') { if (!(await V.enviarParaCalendario())) toast('Cadastre um vencimento primeiro.'); }
-    else if (acao === 'lembrete-dom') R.abrirLembreteDomingo();
+    else if (acao === 'lembrete-seg') R.abrirLembreteSegunda();
+    else if (acao === 'lembrete-prazos') { if (!(await K.enviarParaCalendario())) toast('Nenhum prazo aberto de hoje em diante.'); }
     else if (acao === 'lembrete-hab') { if (!(await H.baixarLembretesDeTodos())) toast('Nenhum hábito tem horário de lembrete. Defina no próprio hábito.'); }
     else if (acao === 'bloquear') window.dispatchEvent(new Event('app:bloquear'));
     else if (acao === 'senha') folhaTrocarSenha();
@@ -172,7 +175,7 @@ export function desenhar(el) {
 async function fazerBackup(el) {
   try {
     if (await backup.fazer()) {
-      toast('Backup gerado. Guarde o arquivo no iCloud Drive.');
+      toast('Backup gerado. Guarde o arquivo numa pasta de nuvem pessoal.');
       desenhar(el);
     }
   } catch (e) {
@@ -259,7 +262,7 @@ function folhaNovaChave() {
     if (!chave) { f.querySelector('#k-erro').textContent = 'Senha incorreta.'; return; }
     const g = abrirFolha(`
       <h3>Sua nova chave</h3>
-      <p class="sub">Guarde no app Senhas do iPhone e num papel. Ela aparece só agora.</p>
+      <p class="sub">Guarde no seu app de senhas e num papel. Ela aparece só agora.</p>
       ${htmlChave(chave)}
       <div class="acts" style="margin-top:10px"><button type="button" class="btn pri" data-fechar>Guardei</button></div>`);
     ligarBotoesChave(chave, toast);
@@ -291,13 +294,14 @@ function folhaPerfil() {
 
 function folhaInstalar() {
   const f = abrirFolha(`
-    <h3>Instalar no iPhone</h3>
+    <h3>Instalar no aparelho</h3>
     <div class="texto">
-      <p>1. Abra o endereço do ${MARCA.nome} no <b>Safari</b> do iPhone.</p>
-      <p>2. Toque no botão <b>Compartilhar</b> (o quadrado com a seta para cima).</p>
-      <p>3. Escolha <b>Adicionar à Tela de Início</b> e toque em <b>Adicionar</b>.</p>
+      <p><b>No iPhone:</b> abra o endereço do ${MARCA.nome} no <b>Safari</b>.</p>
+      <p>Toque no botão <b>Compartilhar</b> (o quadrado com a seta para cima).</p>
+      <p>Escolha <b>Adicionar à Tela de Início</b> e toque em <b>Adicionar</b>.</p>
+      <p><b>No Windows:</b> abra o endereço no Chrome ou no Edge e clique no ícone de instalar, na barra de endereço.</p>
       <p>Pronto: o ${MARCA.nome} aparece como um app, abre em tela cheia e funciona sem internet.</p>
-      <p style="color:var(--soft);font-size:13.5px">Importante: o app instalado guarda os dados separados do Safari. Use sempre o ícone da tela de início.</p>
+      <p style="color:var(--soft);font-size:13.5px">Importante: o app instalado guarda os dados separados do Safari. Use sempre o ícone instalado.</p>
     </div>
     <div class="acts"><button type="button" class="btn pri" data-fechar>Entendi</button></div>`);
   f.querySelector('[data-fechar]').onclick = fecharFolha;
@@ -311,7 +315,7 @@ function folhaSobre() {
     <div class="texto">
       <p><b>Neste aparelho</b>, dentro do navegador, embaralhados com a sua senha. Sem a senha ou a chave de recuperação, ninguém lê.</p>
       <p>${nuvem.ligada() ? '<b>A sincronização está ligada:</b> os dados vão para a nuvem (Supabase, em São Paulo) <b>já embaralhados</b>. A nuvem não consegue ler nada.' : '<b>Nada é enviado para a internet.</b> Se você ligar a sincronização, os dados vão para a nuvem já embaralhados.'}</p>
-      <p><b>Backup:</b> o arquivo .cofre também vai embaralhado. Guarde no iCloud Drive.</p>
+      <p><b>Backup:</b> o arquivo .cofre também vai embaralhado. Guarde numa pasta de nuvem pessoal.</p>
       <p>O que está guardado agora:</p>
       <ul>${linhas}</ul>
     </div>

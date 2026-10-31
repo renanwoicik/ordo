@@ -30,6 +30,7 @@ import * as H from './modulos/habitos.js';
 import * as E from './modulos/entradas.js';
 import * as K from './modulos/clientes.js';
 import * as M from './modulos/compromissos.js';
+import * as Ho from './modulos/honorarios.js';
 import * as S from './modulos/gastos.js';
 import './modulos/metas.js';
 import * as V from './modulos/vencimentos.js';
@@ -73,10 +74,11 @@ const NOVOS = [
   { nome: 'Prazo', desc: 'Digitado por você, com aviso antes', icone: icone.relogio, abrir: () => K.abrirPrazo() },
   { nome: 'Cliente', desc: 'Nova ficha de cadastro', icone: icone.pessoas, abrir: () => K.abrirCliente() },
   { nome: 'Caso', desc: 'Judicial, extrajudicial ou consultivo', icone: icone.trabalho, abrir: () => K.abrirCaso() },
-  { nome: 'Entrada', desc: 'Dinheiro que entrou', icone: icone.dinheiro, abrir: () => E.abrirEntrada() },
+  { nome: 'Honorários', desc: 'Entrada, parcelas e êxito de um cliente', icone: icone.dinheiro, abrir: () => Ho.abrirNovoHonorario() },
+  { nome: 'Entrada', desc: 'Outro dinheiro que entrou', icone: icone.dinheiro, abrir: () => E.abrirEntrada() },
   { nome: 'Vencimento', desc: 'Documento, IPVA, anuidade, contrato', icone: icone.vencimentos, abrir: () => V.abrirVencimento() },
   { nome: 'Estudo', desc: 'Curso, artigo, livro ou tema', icone: icone.estudos, abrir: () => Es.abrirEstudo() },
-  { nome: 'Gasto', desc: 'CPF ou CNPJ, à vista ou parcelado', icone: icone.gasto, abrir: () => S.abrirGasto() },
+  { nome: 'Gasto', desc: 'Pessoal ou trabalho, à vista ou parcelado', icone: icone.gasto, abrir: () => S.abrirGasto() },
   { nome: 'Tarefa', desc: 'Com área, dia, prazo e tempo', icone: icone.tarefa, abrir: () => T.abrirTarefa() },
   { nome: 'Hábito', desc: 'Todo dia ou algumas vezes por semana', icone: icone.revisao, abrir: () => H.abrirHabito() },
 ];
