@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ordo</title>
+  <meta name="description" content="Painel da vida profissional e pessoal.">
+
+  <!-- Instalação no iPhone (Adicionar à Tela de Início) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icones/apple-touch-icon.png">
+  <link rel="icon" href="icones/icone-192.png" type="image/png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ordo">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#D9D9D9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1E3029" media="(prefers-color-scheme: dark)">
+
+  <!-- Nome, logo, cores e chaves deste sistema -->
+  <script src="config.js"></script>
+
+  <!-- Aplica o tema (claro/escuro) antes de desenhar a página, para não piscar -->
+  <script>
+    try {
+      var t = JSON.parse(localStorage.getItem(CONFIG.id + '.tema'));
+      if (t === 'claro') document.documentElement.dataset.theme = 'light';
+      if (t === 'escuro') document.documentElement.dataset.theme = 'dark';
+    } catch (e) {}
+  </script>
+
+  <link rel="stylesheet" href="css/tema.css">
+  <link rel="stylesheet" href="css/app.css">
+
+  <!-- Cores do config.js por cima do tema -->
+  <script>
+    (function () {
+      var c = CONFIG.cores;
+      var vars = function (x) { return '--acc:' + x.destaque + ';--titulo:' + x.titulos + ';--bg:' + x.fundo + ';'; };
+      var s = document.createElement('style');
+      s.textContent = ':root{' + vars(c.claro) + '}'
+        + '@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){' + vars(c.escuro) + '--on-acc:' + c.escuro.fundo + '}}'
+        + ':root[data-theme="dark"]{' + vars(c.escuro) + '--on-acc:' + c.escuro.fundo + '}';
+      document.head.appendChild(s);
+    })();
+  </script>
+</head>
+<body>
+  <!-- Menu lateral (aparece só em telas largas, como no Mac) -->
+  <aside id="lateral" class="lateral" aria-label="Menu" hidden></aside>
+
+  <!-- Área onde cada tela é desenhada (Hoje, Dinheiro, Rotina, Mais) -->
+  <main id="tela" class="wrap" tabindex="-1"></main>
+
+  <!-- Botão flutuante "+ Novo" -->
+  <button class="fab" id="fab" data-acao="novo" hidden>+ Novo</button>
+
+  <!-- Barra de navegação de baixo -->
+  <nav class="tabbar" id="tabbar" aria-label="Navegação principal" hidden></nav>
+
+  <!-- Folha que sobe de baixo (formulários e menus) -->
+  <div id="scrim" class="scrim" hidden></div>
+  <section id="folha" class="sheet" role="dialog" aria-modal="true" hidden></section>
+
+  <!-- Tela de senha (fica por cima de tudo enquanto o cofre está fechado) -->
+  <section id="bloqueio" class="bloqueio" hidden></section>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

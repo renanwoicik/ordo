@@ -1,0 +1,91 @@
+/* =========================================================
+   Sistema · tema
+   Fontes, cores e medidas usadas em todo o sistema.
+   Paleta do Ordo: títulos #1E3029 · destaques #3B3833 · fundo #D9D9D9
+   positivo #D4F2AE · negativo #EEACAC · amarelo #FFF3C6.
+   Os tons de apoio (cartões, linhas, gráficos) saem dela.
+   Cores lisas, sem degradês. Cartões leves, títulos pequenos.
+   ========================================================= */
+
+/* Títulos, números e textos: Helvetica Now Display se estiver instalada; senão a Helvetica do Mac/iPhone.
+   A serifada EB Garamond (guardada junto com o sistema) aparece só, bem discreta, na saudação do painel Hoje.
+   Sem itálico em nenhum lugar. */
+@font-face{font-family:"EB Garamond";font-style:normal;font-weight:400;font-display:swap;src:url(../fontes/eb-garamond-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"EB Garamond";font-style:normal;font-weight:500 700;font-display:swap;src:url(../fontes/eb-garamond-latin-500-normal.woff2) format("woff2")}
+
+/* ---------- modo claro (padrão) ---------- */
+:root{
+  --bg:#D9D9D9;        /* fundo da página */
+  --card:#F4F4F2;      /* cartões */
+  --bg2:#E4E4E1;       /* preenchimentos neutros (trilhos, abas) */
+  --tx:#1E3029;        /* texto principal */
+  --soft:#4F5551;      /* texto secundário */
+  --line:#C9CAC7;      /* bordas */
+
+  --acc:#3B3833;       /* títulos, botões e destaques */
+  --on-acc:#F4F4F2;
+  --titulo:#1E3029;    /* cor dos títulos */
+  --manteiga:#FFF3C6;  /* detalhes */
+  --manteiga2:#FFFAE7; /* amarelo mais clarinho (fundos suaves) */
+  --rosa:#E2E6E2;      /* tom clarinho do verde (iniciais, etiquetas) */
+
+  /* estados */
+  --pos-bg:#D4F2AE; --pos:#2C4A12;        /* verde: positivo / deu certo */
+  --mid-bg:#FFF3C6; --mid:#665314;        /* amarelo: intermediário */
+  --neg-bg:#EEACAC; --neg:#6E1F1F; --neg-forte:#EEACAC; /* vermelho: alerta */
+
+  /* cores dos gráficos (tons orgânicos, combinam com a paleta) */
+  --g1:#1E3029;   /* verde-escuro */
+  --g2:#DB8E8E;   /* rosado */
+  --g3:#E0C467;   /* mostarda */
+  --g4:#A4D173;   /* verde-claro */
+  --g5:#6C9A8E;   /* azul-petróleo */
+  --g6:#84A0B5;   /* azul */
+  --g7:#B98A69;   /* cobre */
+  --g8:#A79BB8;   /* lilás */
+
+  --body:"Helvetica Now Display","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --disp:var(--body);  /* títulos e números: a mesma fonte dos textos */
+  --serif:"EB Garamond",Georgia,"Times New Roman",serif;  /* só a saudação do Hoje */
+  --shadow:0 1px 2px rgba(30,48,41,.03);
+  --raio:18px;
+  --tabbar-h:64px;
+  --lateral-w:248px;
+  color-scheme:light;
+}
+
+/* ---------- modo escuro: automático (segue o iPhone/Mac) ---------- */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1E3029; --card:#283B33; --bg2:#324640;
+    --tx:#E8E8E6; --soft:#A9B5AF; --line:#3D5048;
+    --acc:#D9D9D9; --on-acc:#1E3029; --titulo:#D9D9D9;
+    --manteiga:#4A4630; --manteiga2:#3A3B2C; --rosa:#324640;
+    --pos-bg:#3A5230; --pos:#D4F2AE;
+    --mid-bg:#4A4630; --mid:#FFF3C6;
+    --neg-bg:#563636; --neg:#EEACAC; --neg-forte:#EEACAC;
+    --g1:#D9D9D9; --g2:#E5A3A3; --g3:#E6CF7A; --g4:#B4DC84; --g5:#7FB0A3; --g6:#94B0C5; --g7:#CC9D7C; --g8:#B7ACC8;
+    --shadow:0 1px 2px rgba(0,0,0,.25);
+    color-scheme:dark;
+  }
+}
+/* ... ou escolhido à mão em Ajustes */
+:root[data-theme="dark"]{
+  --bg:#1E3029; --card:#283B33; --bg2:#324640;
+  --tx:#E8E8E6; --soft:#A9B5AF; --line:#3D5048;
+  --acc:#D9D9D9; --on-acc:#1E3029; --titulo:#D9D9D9;
+  --manteiga:#4A4630; --manteiga2:#3A3B2C; --rosa:#324640;
+  --pos-bg:#3A5230; --pos:#D4F2AE;
+  --mid-bg:#4A4630; --mid:#FFF3C6;
+  --neg-bg:#563636; --neg:#EEACAC; --neg-forte:#EEACAC;
+  --g1:#D9D9D9; --g2:#E5A3A3; --g3:#E6CF7A; --g4:#B4DC84; --g5:#7FB0A3; --g6:#94B0C5; --g7:#CC9D7C; --g8:#B7ACC8;
+  --shadow:0 1px 2px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+
+/* ---------- cor de cada área (tarefas, avisos, etiquetas) ---------- */
+:root{
+  --area-trabalho:var(--g1);
+  --area-estudos:var(--g6);
+  --area-pessoal:var(--g4);
+}
