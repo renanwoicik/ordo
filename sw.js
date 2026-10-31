@@ -11,7 +11,7 @@
 
 importScripts('config.js');
 
-const VERSAO = `${self.CONFIG.id}-v2`;
+const VERSAO = `${self.CONFIG.id}-v3`;
 
 const ARQUIVOS = [
   './',

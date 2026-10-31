@@ -419,8 +419,7 @@ function lerCSV(texto) {
   const itens = [];
   for (const l of corpo) {
     const c = partir(l);
-    const data = dataBR(c[iData] ?? ''), txt = String(c[iVal] ?? '').replace(/[R$\s]/g, '');
-    const v = Number((txt.includes(',') ? txt.replace(/\./g, '').replace(',', '.') : txt));
+    const data = dataBR(c[iData] ?? ''), v = lerValor(c[iVal]);
     if (!data || !Number.isFinite(v)) continue;
     itens.push({ data, desc: c[iDesc] || 'Sem descrição', bruto: v });
   }
